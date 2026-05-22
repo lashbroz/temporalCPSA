@@ -1,0 +1,26 @@
+Package: temporalCPSA
+Title: Cross-Population Survival Analysis via Temporal Molecular Profiles
+Version: 0.0.0.9000
+Authors@R: person("Nicole", "Tignor", email = "nicole.tignor@gmail.com", role = c("aut", "cre"))
+Author: Nicole Tignor
+Maintainer: Nicole Tignor <nicole.tignor@gmail.com>
+Description: Framework for both manuscript reproduction and reusable cross-population survival analysis via temporal molecular profiles. The package supports TMP generation, tumor-normal trajectory comparison, trajectory visualization and divergence analysis, multi-omic age-class clustering, and downstream survival modeling including Cross-Population Survival Analysis.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Imports:
+    cluster,
+    readxl,
+    survival,
+    stats,
+    utils
+Suggests:
+    testthat (>= 3.0.0),
+    ggplot2,
+    ConsensusClusterPlus,
+    locfdr,
+    locfit
+Config/testthat/edition: 3
+URL: https://github.com/lashbroz/temporalCPSA
+BugReports: https://github.com/lashbroz/temporalCPSA/issues
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

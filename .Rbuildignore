@@ -1,0 +1,8 @@
+^\.git$
+^\.github$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.DS_Store$
+^ageTMP\.Rcheck$
+^temporalCPSA\.Rcheck$
+^cpsa\.Rcheck$
