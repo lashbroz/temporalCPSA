@@ -9,9 +9,6 @@ install.packages("remotes")
 remotes::install_github("lashbroz/temporalCPSA")
 ```
 
-The package has been renamed to `temporalCPSA`; the current exported function
-prefix remains `ageTMP_*` during the beta period.
-
 ## General CPSA Workflow
 
 The core workflow starts with a feature-by-sample matrix and a reference-cohort
