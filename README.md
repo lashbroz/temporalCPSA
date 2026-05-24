@@ -30,8 +30,8 @@ molecular structure across biologically heterogeneous datasets.
 - Reproducing CPSA analyses from Tignor et al., *Proteogenomic analysis of
   pediatric and AYA high-grade glioma*.
 - Using deeply profiled CPTAC or related multi-omic cohorts to inform survival
-  modeling in external clinically annotated populations with sparse molecular
-  data.
+  modeling in external clinically annotated populations with sparse or absent
+  molecular data.
 - Modeling age-associated molecular trajectories and exploring age structure
   across proteomic, transcriptomic, phosphoproteomic, glycoproteomic, and
   genomic datasets.
