@@ -267,8 +267,8 @@ scripts are organized to read from its repository-level `data/` directory once
 the public source files are placed there. Serialized package data are reserved
 for documented external reference data that are part of the analysis provenance.
 
-Detailed manuscript-specific trajectory settings are documented separately in
-[`docs/manuscript-trajectory-reproduction-notes.md`](../docs/manuscript-trajectory-reproduction-notes.md).
+Detailed manuscript-specific trajectory settings are kept with the relevant
+figure-generation scripts in the Wang Lab reproducibility repository.
 
 The CPSA model engine computes raw p-values and, by default, Benjamini-Yekutieli
 FDR columns with `stats::p.adjust(..., method = "BY")`. In the manuscript
