@@ -92,32 +92,18 @@ fit <- ageTMP_fit_reference_cpsa(
 
 ## Optional Age-Class Exploration
 
-Age-class estimation is an optional exploratory module, not the first or
-decisive step in the CPSA pipeline. It is useful when investigators want to ask
-whether age-dependent temporal molecular profiles suggest biologically coherent
-age intervals before choosing a modeling strategy.
+Age-class estimation is optional. Users may supply their own age classes, model
+age continuously, or use `temporalCPSA` diagnostics to explore whether AD-TMP
+structure supports age-contiguous intervals.
 
-In the manuscript workflow, age classes were informed by molecular profiles
-rather than assigned by clinical age cutpoints alone. The analysis first derived
-sex-stratified age-dependent TMP matrices across molecular data types, combined
-dynamic protein, RNA, and phosphosite features, clustered samples, and then
-summarized molecularly supported age classes.
+In the manuscript, age classes were chosen by considering both temporal
+molecular clustering and conventional age distributions. In `temporalCPSA`, we
+implement a data-driven diagnostic approach: candidate classes are constrained
+to ordered age intervals, while the AD-TMP matrix determines which intervals are
+best supported.
 
-For new cohorts, the package exposes an explicitly age-contiguous segmentation
-of the AD-TMP matrix. This is inspired by the manuscript experience with
-AD-TMP clustering and the accompanying green, age-ordered diagnostic heatmap,
-where molecularly coherent age strata were recognized from their ordered
-structure. The manuscript did not implement this as a formal constrained
-optimizer. In the paper, the selected classes balanced data-driven AD-TMP
-structure with developmental precedent, with particular attention to preserving
-adolescence as a distinct biology-informed interval because it emerged as a
-deeper split in the diagnostic landscape.
-
-The package makes the contiguity principle explicit by optimizing over age
-cutpoints directly. As a result, every proposed class is an age interval by
-construction, while the AD-TMP matrix still determines which intervals are
-favored. This diagnostic should be treated as exploratory support for
-age-class assessment and interpretation.
+These diagnostics are intended for cohort exploration and interpretation, not
+as a required or decisive step in the CPSA pipeline.
 
 The current beta exposes the underlying trajectory and clustering building
 blocks while the full Figure 2 age-class reproduction workflow is being
