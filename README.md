@@ -28,7 +28,8 @@ molecular structure across biologically heterogeneous datasets.
 ## What Can This Package Be Used For?
 
 - Reproducing CPSA analyses from Tignor et al., *Proteogenomic analysis of
-  pediatric and AYA high-grade glioma*.
+  pediatric and AYA high-grade glioma*, using the companion
+  [Wang Lab manuscript repository](https://github.com/WangLab-MSSM/Pediatric-AYA-high-grade-glioma).
 - Using deeply profiled CPTAC or related multi-omic cohorts to inform survival
   modeling in external clinically annotated populations with sparse or absent
   molecular data.
