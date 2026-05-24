@@ -18,10 +18,9 @@ clinical table. Rows of the feature matrix are molecular features or trajectory
 scores, and columns are sample IDs. The clinical table supplies survival time,
 event status, age class, and adjustment covariates.
 
-Users may bring their own age-class structure, use age classes defined by a
-prior biological or clinical rationale, explore age classes from AD-TMP
-diagnostics, or omit age classes entirely. The CPSA model specification controls
-which of these choices is used for a given analysis.
+Users may supply age classes, model age continuously, explore age classes from
+AD-TMP diagnostics, or omit age classes entirely. The CPSA model specification
+controls which choice is used.
 
 ```r
 feature_matrix <- your_feature_matrix
@@ -91,8 +90,8 @@ fit <- ageTMP_fit_reference_cpsa(
 
 ## Optional Age-Class Exploration
 
-Age-class estimation is optional. Users may supply their own age classes, model
-age continuously, or use `temporalCPSA` diagnostics to explore whether AD-TMP
+Age-class estimation is optional. Users may supply age classes, model age
+continuously, or use `temporalCPSA` diagnostics to explore whether AD-TMP
 structure supports age-contiguous intervals.
 
 In the manuscript, age classes were chosen by considering both temporal
@@ -147,12 +146,9 @@ fit$cutpoints
 fit$segment_summary
 ```
 
-To review the ordered segmentation landscape, draw the green diagnostic heatmap.
-The optimizer-selected solution can be highlighted, and manuscript-style or
-investigator-selected class boundaries can be drawn on the same display. This
-keeps the diagnostic honest: the green heatmap shows the molecular segmentation
-landscape, while the overlaid cutpoints show the proposed age-class
-interpretation.
+To review the ordered segmentation landscape, draw the green diagnostic heatmap
+and overlay optimizer-selected, manuscript-style, or investigator-selected
+cutpoints.
 
 ```r
 diagnostic <- ageTMP_segment_diagnostic_matrix(
@@ -172,16 +168,13 @@ ageTMP_plot_segment_diagnostic(
 ```
 
 Simple helpers such as `ageTMP_derive_age_class()` remain available for applying
-predefined cutpoints after molecular age classes have been established, but they
-are not a substitute for the TMP-based age-class exploration workflow.
+predefined cutpoints.
 
 ## Manuscript Reproduction
 
-The current beta also supports direct manuscript reproduction from public source
-files:
+The package also supports manuscript reproduction from public source files:
 
-Paper figure-generation scripts are maintained in the companion manuscript
-repository:
+Paper figure-generation scripts live in the companion manuscript repository:
 [`WangLab-MSSM/Pediatric-AYA-high-grade-glioma`](https://github.com/WangLab-MSSM/Pediatric-AYA-high-grade-glioma).
 
 ```r
@@ -221,16 +214,6 @@ Manuscript-specific wrappers such as `ageTMP_build_sa_protein_cdisc()` are kept
 for direct table reproduction because the published table columns use the
 `cdisc` label.
 
-The package is being organized around these modules:
-
-- public data loading and sample harmonization from manuscript source tables;
-- temporal molecular profile and trajectory generation;
-- tumor versus normal/reference trajectory comparison, including Figure 2-style analyses;
-- trajectory divergence summaries and visualization;
-- clustering of age-dependent trajectory patterns;
-- downstream association and survival modeling, including Cross-Population
-  Survival Analysis (CPSA).
-
 ## Terminology
 
 The package uses general cohort language in its public API:
@@ -252,7 +235,9 @@ such as `cDisc` in file names and column names. In package documentation, `cDisc
 should be read as the manuscript's reference cohort label, not as a requirement
 for general use.
 
-Normal/reference DLPFC developmental data used for trajectory analyses are documented package extdata derived from the DEveLopmental Trajectory Atlas (DELTA), PMID: 30518843, available at <http://amp.pharm.mssm.edu/DELTA>.
+Normal/reference DLPFC developmental data used for trajectory analyses are
+documented package extdata derived from the DEveLopmental Trajectory Atlas
+(DELTA), PMID: 30518843, available at <http://amp.pharm.mssm.edu/DELTA>.
 
 ## Reproducibility Principle
 
@@ -262,10 +247,8 @@ Wang Lab reproducibility repository:
 
 Reproducible workflows should read directly from documented source files
 whenever possible and avoid hidden `.RData` objects or manually generated
-intermediate TSV files. In the companion manuscript repository, paper-facing
-scripts are organized to read from its repository-level `data/` directory once
-the public source files are placed there. Serialized package data are reserved
-for documented external reference data that are part of the analysis provenance.
+intermediate TSV files. Serialized package data are reserved for documented
+external reference data that are part of the analysis provenance.
 
 Detailed manuscript-specific trajectory settings are kept with the relevant
 figure-generation scripts in the Wang Lab reproducibility repository.
