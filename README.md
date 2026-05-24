@@ -4,6 +4,8 @@
 
 ## Installation
 
+Install the current development version from GitHub:
+
 ```r
 install.packages("remotes")
 remotes::install_github("lashbroz/temporalCPSA")
