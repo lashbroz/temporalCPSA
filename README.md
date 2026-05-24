@@ -258,7 +258,16 @@ Normal/reference DLPFC developmental data used for trajectory analyses are docum
 
 ## Reproducibility Principle
 
-Paper-facing workflows should read directly from public source files in `data/` whenever possible and avoid hidden `.RData` objects or manually generated intermediate TSV files. Serialized package data are reserved for documented external reference data that are part of the analysis provenance.
+The complete manuscript figure-generation scripts are maintained in the
+Wang Lab reproducibility repository:
+[`WangLab-MSSM/Pediatric-AYA-high-grade-glioma`](https://github.com/WangLab-MSSM/Pediatric-AYA-high-grade-glioma).
+
+Reproducible workflows should read directly from documented source files
+whenever possible and avoid hidden `.RData` objects or manually generated
+intermediate TSV files. In the companion manuscript repository, paper-facing
+scripts are organized to read from its repository-level `data/` directory once
+the public source files are placed there. Serialized package data are reserved
+for documented external reference data that are part of the analysis provenance.
 
 Detailed manuscript-specific trajectory settings are documented separately in
 [`docs/manuscript-trajectory-reproduction-notes.md`](../docs/manuscript-trajectory-reproduction-notes.md).
