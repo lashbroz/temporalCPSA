@@ -104,10 +104,6 @@ best supported.
 These diagnostics are intended for cohort exploration and interpretation, not
 as a required or decisive step in the CPSA pipeline.
 
-The current beta exposes the underlying trajectory and clustering building
-blocks while the full Figure 2 age-class reproduction workflow is being
-assembled:
-
 ```r
 library(temporalCPSA)
 
