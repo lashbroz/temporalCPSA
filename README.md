@@ -185,6 +185,10 @@ are not a substitute for the TMP-based age-class exploration workflow.
 The current beta also supports direct manuscript reproduction from public source
 files:
 
+Paper figure-generation scripts are maintained in the companion manuscript
+repository:
+[`WangLab-MSSM/Pediatric-AYA-high-grade-glioma`](https://github.com/WangLab-MSSM/Pediatric-AYA-high-grade-glioma).
+
 ```r
 # Example manuscript workflow pieces
 temporalCPSA::ageTMP_data_sources("data")
