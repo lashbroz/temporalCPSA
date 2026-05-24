@@ -25,7 +25,7 @@ external cohort are then assessed for concordance and validation back within the
 original discovery cohort, enabling cross-population evaluation of prognostic
 molecular structure across biologically heterogeneous datasets.
 
-## Example Use Cases
+## What Can This Package Be Used For?
 
 - Reproducing CPSA analyses from Tignor et al., *Proteogenomic analysis of
   pediatric and AYA high-grade glioma*.
