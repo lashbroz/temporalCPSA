@@ -7,6 +7,7 @@ Maintainer: Nicole Tignor <nicole.tignor@gmail.com>
 Description: Framework for both manuscript reproduction and reusable cross-population survival analysis via temporal molecular profiles. The package supports TMP generation, tumor-normal trajectory comparison, trajectory visualization and divergence analysis, multi-omic age-class clustering, and downstream survival modeling including Cross-Population Survival Analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
+LazyData: true
 Imports:
     cluster,
     readxl,

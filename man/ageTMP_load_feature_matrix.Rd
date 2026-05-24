@@ -8,7 +8,7 @@ ageTMP_load_feature_matrix(
   data_dir = "data",
   modality = c("protein", "rna", "glyco", "phospho"),
   collapse = TRUE,
-  row_id = "ApprovedGeneSymbol"
+  row_id = NULL
 )
 }
 \arguments{
@@ -20,7 +20,8 @@ modalities return a named list of matrices.}
 
 \item{collapse}{Whether to average rows with the same feature identifier.}
 
-\item{row_id}{Annotation column to use as the feature identifier.}
+\item{row_id}{Annotation column to use as the feature identifier. If \code{NULL},
+a modality-aware default is used.}
 }
 \value{
 A numeric feature-by-sample matrix, or a named list of matrices when
@@ -28,6 +29,8 @@ multiple modalities are requested.
 }
 \description{
 Load one or more public molecular abundance matrices as feature-by-sample
-numeric matrices. Rows are identified by \code{ApprovedGeneSymbol} when available,
-and duplicate feature rows can be averaged to produce one row per molecule.
+numeric matrices. Rows are identified by molecule-level identifiers when
+available, and duplicate feature rows can be averaged to produce one row per
+molecule. For phosphosite data, uncollapsed matrices use \code{Site} row IDs,
+while collapsed matrices use \code{ApprovedGeneSymbol} row IDs.
 }

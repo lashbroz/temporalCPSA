@@ -2,6 +2,11 @@ select_adaptive_span <- function(x, y, min_span = 0.5, max_span = 3, span_step =
   if (!requireNamespace("locfit", quietly = TRUE)) {
     stop("Package `locfit` is required when `adaptive_span = TRUE`.", call. = FALSE)
   }
+  if (!"package:locfit" %in% search()) {
+    suppressPackageStartupMessages(
+      require("locfit", quietly = TRUE, warn.conflicts = FALSE)
+    )
+  }
 
   ok <- !is.na(x) & !is.na(y)
   x <- as.numeric(x[ok])

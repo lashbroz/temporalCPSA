@@ -88,15 +88,18 @@ ageTMP_load_cdisc_protein_matrix <- function(data_dir = "data", collapse = TRUE)
 #' Load a public feature matrix
 #'
 #' Load one or more public molecular abundance matrices as feature-by-sample
-#' numeric matrices. Rows are identified by `ApprovedGeneSymbol` when available,
-#' and duplicate feature rows can be averaged to produce one row per molecule.
+#' numeric matrices. Rows are identified by molecule-level identifiers when
+#' available, and duplicate feature rows can be averaged to produce one row per
+#' molecule. For phosphosite data, uncollapsed matrices use `Site` row IDs,
+#' while collapsed matrices use `ApprovedGeneSymbol` row IDs.
 #'
 #' @param data_dir Path to the public data directory.
 #' @param modality Molecular modality or modalities accepted by
 #'   [ageTMP_load_molecular()]. A single modality returns one matrix; multiple
 #'   modalities return a named list of matrices.
 #' @param collapse Whether to average rows with the same feature identifier.
-#' @param row_id Annotation column to use as the feature identifier.
+#' @param row_id Annotation column to use as the feature identifier. If `NULL`,
+#'   a modality-aware default is used.
 #'
 #' @return A numeric feature-by-sample matrix, or a named list of matrices when
 #'   multiple modalities are requested.
@@ -105,17 +108,21 @@ ageTMP_load_feature_matrix <- function(
   data_dir = "data",
   modality = c("protein", "rna", "glyco", "phospho"),
   collapse = TRUE,
-  row_id = "ApprovedGeneSymbol"
+  row_id = NULL
 ) {
   allowed <- c("protein", "rna", "glyco", "phospho")
   if (length(modality) > 1) {
     modality <- match.arg(modality, allowed, several.ok = TRUE)
     out <- lapply(modality, function(one_modality) {
+      one_row_id <- row_id
+      if (!is.null(row_id) && length(row_id) > 1 && !is.null(names(row_id)) && one_modality %in% names(row_id)) {
+        one_row_id <- row_id[[one_modality]]
+      }
       ageTMP_load_feature_matrix(
         data_dir = data_dir,
         modality = one_modality,
         collapse = collapse,
-        row_id = row_id
+        row_id = one_row_id
       )
     })
     names(out) <- modality
@@ -130,6 +137,15 @@ ageTMP_load_feature_matrix <- function(
     glyco = seq_len(min(4, ncol(raw))),
     phospho = seq_len(min(9, ncol(raw)))
   )
+  if (is.null(row_id)) {
+    row_id <- switch(
+      modality,
+      protein = "ApprovedGeneSymbol",
+      rna = "ApprovedGeneSymbol",
+      glyco = names(raw)[annotation_cols[1]],
+      phospho = if (isTRUE(collapse)) "ApprovedGeneSymbol" else "Site"
+    )
+  }
   if (!row_id %in% names(raw)) {
     row_id <- names(raw)[annotation_cols[1]]
   }
