@@ -1,6 +1,6 @@
 # temporalCPSA
 
-`temporalCPSA` is an R package for reproducible Cross-Population Survival Analysis (CPSA) and reusable temporal molecular profiling workflows across independent cohorts.
+`temporalCPSA` is an R package implementing Cross-Population Survival Analysis (CPSA) workflows for reproducible analysis and generalized temporal molecular profiling across heterogeneous cohorts.
 
 ## Installation
 
