@@ -54,6 +54,61 @@ Default arguments in several trajectory and CPSA helpers reflect the manuscript
 analysis settings; users should review and modify these settings for other
 cohorts, molecular platforms, or modeling designs.
 
+## Estimating Temporal Molecular Trajectories
+
+The basic trajectory-estimation helper is
+`ageTMP_predict_tumor_trajectory_matrix()`. It fits age-associated molecular
+trajectories in a deeply profiled cohort and predicts those trajectory values
+at the ages of a target cohort. The target cohort can be the same cohort, an
+external clinically annotated cohort, or an age grid used for visualization.
+
+```{r trajectory-estimation}
+library(temporalCPSA)
+
+tumor_matrix <- your_feature_by_sample_matrix
+discovery_clinical <- your_discovery_clinical_table
+target_clinical <- your_target_clinical_table
+
+trajectory_fit <- ageTMP_predict_tumor_trajectory_matrix(
+  tumor_mat = tumor_matrix,
+  tumor_metadata = discovery_clinical,
+  prediction_metadata = target_clinical,
+  tumor_sample_col = "sample_id",
+  tumor_age_col = "age",
+  tumor_sex_col = "sex",
+  prediction_sample_col = "sample_id",
+  prediction_age_col = "age",
+  prediction_sex_col = "sex",
+  span = 0.75,
+  prediction_scope = "all_samples",
+  return_trajectory = TRUE
+)
+
+trajectory_matrix <- trajectory_fit$matrix
+trajectory_long <- trajectory_fit$trajectory
+```
+
+For tumor-versus-normal/reference trajectory comparisons, use
+`ageTMP_compare_normal_tumor_trajectory()` when both a tumor cohort and a
+normal/reference cohort are available:
+
+```{r normal-tumor-trajectory}
+trajectory_comparison <- ageTMP_compare_normal_tumor_trajectory(
+  tumor_mat = tumor_matrix,
+  normal_mat = normal_reference_matrix,
+  tumor_metadata = discovery_clinical,
+  normal_metadata = normal_reference_clinical,
+  tumor_sample_col = "sample_id",
+  normal_sample_col = "sample_id",
+  tumor_age_col = "age",
+  normal_age_col = "age",
+  tumor_sex_col = "sex",
+  normal_sex_col = "sex",
+  features = rownames(tumor_matrix)[1:25],
+  span = 0.75
+)
+```
+
 ```{r cpsa-spec}
 library(temporalCPSA)
 
