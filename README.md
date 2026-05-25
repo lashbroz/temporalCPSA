@@ -17,7 +17,7 @@ Cross-Population Survival Analysis (CPSA) is a framework for integrating
 temporal molecular profiling with survival inference across complementary
 patient cohorts.
 
-CPSA estimates temporal molecular patterns (T-TMPs) in deeply profiled
+CPSA estimates temporal molecular patterns (TMPs) in deeply profiled
 discovery cohorts, evaluates their clinical relevance in external populations,
 and then assesses concordance back in the discovery cohort. This supports
 cross-population evaluation of prognostic molecular structure across
