@@ -84,7 +84,52 @@
 <p>The core workflow starts with a feature-by-sample matrix and a reference-cohort clinical table containing survival time, event status, age class, and adjustment covariates.</p>
 <p>Users may supply age classes, model age continuously, explore age classes from AD-TMP diagnostics, or omit age classes entirely. The CPSA model specification controls which choice is used.</p>
 <p>Default arguments in several trajectory and CPSA helpers reflect the manuscript analysis settings; users should review and modify these settings for other cohorts, molecular platforms, or modeling designs.</p>
+</div>
+<div class="section level2">
+<h2 id="estimating-temporal-molecular-trajectories">Estimating Temporal Molecular Trajectories<a class="anchor" aria-label="anchor" href="#estimating-temporal-molecular-trajectories"></a>
+</h2>
+<p>The basic trajectory-estimation helper is <code><a href="reference/ageTMP_predict_tumor_trajectory_matrix.html">ageTMP_predict_tumor_trajectory_matrix()</a></code>. It fits age-associated molecular trajectories in a deeply profiled cohort and predicts those trajectory values at the ages of a target cohort. The target cohort can be the same cohort, an external clinically annotated cohort, or an age grid used for visualization.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lashbroz.github.io/temporalCPSA/">temporalCPSA</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">tumor_matrix</span> <span class="op">&lt;-</span> <span class="va">your_feature_by_sample_matrix</span></span>
+<span><span class="va">discovery_clinical</span> <span class="op">&lt;-</span> <span class="va">your_discovery_clinical_table</span></span>
+<span><span class="va">target_clinical</span> <span class="op">&lt;-</span> <span class="va">your_target_clinical_table</span></span>
+<span></span>
+<span><span class="va">trajectory_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_predict_tumor_trajectory_matrix.html">ageTMP_predict_tumor_trajectory_matrix</a></span><span class="op">(</span></span>
+<span>  tumor_mat <span class="op">=</span> <span class="va">tumor_matrix</span>,</span>
+<span>  tumor_metadata <span class="op">=</span> <span class="va">discovery_clinical</span>,</span>
+<span>  prediction_metadata <span class="op">=</span> <span class="va">target_clinical</span>,</span>
+<span>  tumor_sample_col <span class="op">=</span> <span class="st">"sample_id"</span>,</span>
+<span>  tumor_age_col <span class="op">=</span> <span class="st">"age"</span>,</span>
+<span>  tumor_sex_col <span class="op">=</span> <span class="st">"sex"</span>,</span>
+<span>  prediction_sample_col <span class="op">=</span> <span class="st">"sample_id"</span>,</span>
+<span>  prediction_age_col <span class="op">=</span> <span class="st">"age"</span>,</span>
+<span>  prediction_sex_col <span class="op">=</span> <span class="st">"sex"</span>,</span>
+<span>  span <span class="op">=</span> <span class="fl">0.75</span>,</span>
+<span>  prediction_scope <span class="op">=</span> <span class="st">"all_samples"</span>,</span>
+<span>  return_trajectory <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">trajectory_matrix</span> <span class="op">&lt;-</span> <span class="va">trajectory_fit</span><span class="op">$</span><span class="va">matrix</span></span>
+<span><span class="va">trajectory_long</span> <span class="op">&lt;-</span> <span class="va">trajectory_fit</span><span class="op">$</span><span class="va">trajectory</span></span></code></pre></div>
+<p>For tumor-versus-normal/reference trajectory comparisons, use <code><a href="reference/ageTMP_compare_normal_tumor_trajectory.html">ageTMP_compare_normal_tumor_trajectory()</a></code> when both a tumor cohort and a normal/reference cohort are available:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">trajectory_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_compare_normal_tumor_trajectory.html">ageTMP_compare_normal_tumor_trajectory</a></span><span class="op">(</span></span>
+<span>  tumor_mat <span class="op">=</span> <span class="va">tumor_matrix</span>,</span>
+<span>  normal_mat <span class="op">=</span> <span class="va">normal_reference_matrix</span>,</span>
+<span>  tumor_metadata <span class="op">=</span> <span class="va">discovery_clinical</span>,</span>
+<span>  normal_metadata <span class="op">=</span> <span class="va">normal_reference_clinical</span>,</span>
+<span>  tumor_sample_col <span class="op">=</span> <span class="st">"sample_id"</span>,</span>
+<span>  normal_sample_col <span class="op">=</span> <span class="st">"sample_id"</span>,</span>
+<span>  tumor_age_col <span class="op">=</span> <span class="st">"age"</span>,</span>
+<span>  normal_age_col <span class="op">=</span> <span class="st">"age"</span>,</span>
+<span>  tumor_sex_col <span class="op">=</span> <span class="st">"sex"</span>,</span>
+<span>  normal_sex_col <span class="op">=</span> <span class="st">"sex"</span>,</span>
+<span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">tumor_matrix</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">25</span><span class="op">]</span>,</span>
+<span>  span <span class="op">=</span> <span class="fl">0.75</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">feature_matrix</span> <span class="op">&lt;-</span> <span class="va">your_feature_matrix</span></span>
 <span><span class="va">survival_data</span> <span class="op">&lt;-</span> <span class="va">your_survival_data</span></span>
 <span></span>
@@ -104,7 +149,7 @@
 <span>  spec <span class="op">=</span> <span class="va">spec</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>For a standard Cox model without age-class interaction terms, set <code>age_class_col</code>, <code>age_reference</code>, and <code>strata</code> to <code>NULL</code>:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">standard_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_cpsa_spec.html">ageTMP_cpsa_spec</a></span><span class="op">(</span></span>
 <span>  age_class_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  age_reference <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -120,7 +165,7 @@
 <span>  spec <span class="op">=</span> <span class="va">standard_spec</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>When CPSA is applied to age-dependent trajectory features, users should screen out features with minimal trajectory dynamic range before interpreting survival associations. The package can apply this screen inside the CPSA fit using a named trajectory-SD vector, a trajectory prediction matrix, or the output of <code><a href="reference/ageTMP_rank_trajectory_sd.html">ageTMP_rank_trajectory_sd()</a></code>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">trajectory_sd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_rank_trajectory_sd.html">ageTMP_rank_trajectory_sd</a></span><span class="op">(</span></span>
 <span>  <span class="va">tumor_trajectory</span>,</span>
 <span>  feature_col <span class="op">=</span> <span class="st">"feature"</span>,</span>
@@ -147,7 +192,7 @@
 <p>Age-class estimation is optional. Users may supply age classes, model age continuously, or use <code>temporalCPSA</code> diagnostics to explore whether AD-TMP structure supports age-contiguous intervals.</p>
 <p>In the manuscript, age classes were chosen by considering both temporal molecular clustering and conventional age distributions. In <code>temporalCPSA</code>, we implement a data-driven diagnostic approach: candidate classes are constrained to ordered age intervals, while the AD-TMP matrix determines which intervals are best supported.</p>
 <p>These diagnostics are intended for cohort exploration and interpretation, not as a required or decisive step in the CPSA pipeline.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lashbroz.github.io/temporalCPSA/">temporalCPSA</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">clinical</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_load_discovery_clinical.html">ageTMP_load_discovery_clinical</a></span><span class="op">(</span><span class="st">"data"</span><span class="op">)</span></span>
@@ -174,7 +219,7 @@
 <span><span class="va">combined_tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_combine_tmp_matrices.html">ageTMP_combine_tmp_matrices</a></span><span class="op">(</span><span class="va">tmp_matrices</span><span class="op">)</span></span>
 <span><span class="va">age_clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_cluster_tmp_samples.html">ageTMP_cluster_tmp_samples</a></span><span class="op">(</span><span class="va">combined_tmp</span><span class="op">)</span></span></code></pre></div>
 <p>To derive exploratory age classes with guaranteed contiguity:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_segment_age_classes.html">ageTMP_segment_age_classes</a></span><span class="op">(</span></span>
 <span>  tmp_matrix <span class="op">=</span> <span class="va">combined_tmp</span>,</span>
 <span>  sample_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">clinical</span><span class="op">$</span><span class="va">cDisc_age</span>, <span class="va">clinical</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>,</span>
@@ -186,7 +231,7 @@
 <span><span class="va">fit</span><span class="op">$</span><span class="va">cutpoints</span></span>
 <span><span class="va">fit</span><span class="op">$</span><span class="va">segment_summary</span></span></code></pre></div>
 <p>To review the ordered segmentation landscape, draw the green diagnostic heatmap and overlay optimizer-selected, manuscript-style, or investigator-selected cutpoints.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">diagnostic</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_segment_diagnostic_matrix.html">ageTMP_segment_diagnostic_matrix</a></span><span class="op">(</span></span>
 <span>  tmp_matrix <span class="op">=</span> <span class="va">combined_tmp</span>,</span>
 <span>  sample_age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="va">clinical</span><span class="op">$</span><span class="va">cDisc_age</span>, <span class="va">clinical</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>,</span>
@@ -208,12 +253,12 @@
 </h2>
 <p>The package also supports manuscript reproduction from public source files:</p>
 <p>Paper figure-generation scripts live in the companion manuscript repository: <a href="https://github.com/WangLab-MSSM/Pediatric-AYA-high-grade-glioma" class="external-link"><code>WangLab-MSSM/Pediatric-AYA-high-grade-glioma</code></a>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Example manuscript workflow pieces</span></span>
 <span><span class="fu">temporalCPSA</span><span class="fu">::</span><span class="fu"><a href="reference/ageTMP_data_sources.html">ageTMP_data_sources</a></span><span class="op">(</span><span class="st">"data"</span><span class="op">)</span></span>
 <span><span class="fu">temporalCPSA</span><span class="fu">::</span><span class="fu"><a href="reference/ageTMP_load_normal_reference.html">ageTMP_load_normal_reference</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Preferred public-facing functions use reference-cohort language:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">clinical</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_load_reference_clinical.html">ageTMP_load_reference_clinical</a></span><span class="op">(</span><span class="st">"data"</span><span class="op">)</span></span>
 <span><span class="va">mutation</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_load_reference_mutation.html">ageTMP_load_reference_mutation</a></span><span class="op">(</span><span class="st">"data"</span><span class="op">)</span></span>
 <span><span class="va">feature_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ageTMP_load_reference_protein_matrix.html">ageTMP_load_reference_protein_matrix</a></span><span class="op">(</span><span class="st">"data"</span><span class="op">)</span></span>
