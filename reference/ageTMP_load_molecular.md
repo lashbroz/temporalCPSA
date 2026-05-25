@@ -7,7 +7,7 @@ Load a public molecular data table
 ``` r
 ageTMP_load_molecular(
   data_dir = "data",
-  modality = c("protein", "rna", "glyco", "phospho", "mutation", "cnv", "full_mutation")
+  modality = c("protein", "rna", "glyco", "phospho", "mutation", "full_mutation")
 )
 ```
 
@@ -19,8 +19,8 @@ ageTMP_load_molecular(
 
 - modality:
 
-  One of `"protein"`, `"rna"`, `"glyco"`, `"phospho"`, `"mutation"`,
-  `"cnv"`, or `"full_mutation"`.
+  One of `"protein"`, `"rna"`, `"glyco"`, `"phospho"`, `"mutation"`, or
+  `"full_mutation"`.
 
 ## Value
 
