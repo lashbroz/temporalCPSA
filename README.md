@@ -33,9 +33,11 @@ molecular structure across biologically heterogeneous datasets.
 - Using deeply profiled CPTAC or related multi-omic cohorts to inform survival
   modeling in external clinically annotated populations with sparse or absent
   molecular data.
-- Modeling age-associated molecular trajectories and exploring age structure
-  across proteomic, transcriptomic, phosphoproteomic, glycoproteomic, and
-  genomic datasets.
+- Modeling age-associated molecular trajectories to facilitate comparison of age-related
+  molecular dynamics within and between cohorts, including tumor versus normal
+  and male versus female tissue comparisons.
+- Exploration of age structure within cohorts based on clustering of molecular
+  abundance profiles across diverse multi-omic data types.
 
 ## General CPSA Workflow
 
