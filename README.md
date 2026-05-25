@@ -18,7 +18,8 @@ prognostic molecular trajectories across complementary patient cohorts.
 
 CPSA estimates temporal molecular patterns (TMPs) in deeply profiled discovery
 cohorts, evaluates their clinical relevance in external clinically annotated
-populations, and assesses concordance back in the discovery cohort. This enables
+populations, and validates these prognostic patterns back in the discovery
+cohort. This enables
 cross-population evaluation of prognostic molecular structure across
 biologically heterogeneous datasets.
 
