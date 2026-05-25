@@ -18,12 +18,10 @@ temporal molecular profiling with survival inference across complementary
 patient cohorts.
 
 CPSA estimates temporal molecular patterns (T-TMPs) in deeply profiled
-discovery cohorts and evaluates their clinical relevance in larger external
-populations where survival annotation is more extensive but molecular profiling
-may be limited. Survival-associated molecular programs identified in the
-external cohort are then assessed for concordance and validation back within the
-original discovery cohort, enabling cross-population evaluation of prognostic
-molecular structure across biologically heterogeneous datasets.
+discovery cohorts, evaluates their clinical relevance in external populations,
+and then assesses concordance back in the discovery cohort. This supports
+cross-population evaluation of prognostic molecular structure across
+biologically heterogeneous datasets.
 
 ## What Can This Package Be Used For?
 
@@ -42,13 +40,16 @@ molecular structure across biologically heterogeneous datasets.
 ## General CPSA Workflow
 
 The core workflow starts with a feature-by-sample matrix and a reference-cohort
-clinical table. Rows of the feature matrix are molecular features or trajectory
-scores, and columns are sample IDs. The clinical table supplies survival time,
-event status, age class, and adjustment covariates.
+clinical table containing survival time, event status, age class, and
+adjustment covariates.
 
 Users may supply age classes, model age continuously, explore age classes from
 AD-TMP diagnostics, or omit age classes entirely. The CPSA model specification
 controls which choice is used.
+
+Default arguments in several trajectory and CPSA helpers reflect the manuscript
+analysis settings; users should review and modify these settings for other
+cohorts, molecular platforms, or modeling designs.
 
 ```r
 feature_matrix <- your_feature_matrix
@@ -102,7 +103,7 @@ trajectory_sd <- ageTMP_rank_trajectory_sd(
   tumor_trajectory,
   feature_col = "feature",
   value_col = "fit",
-  group_cols = "sex"
+  group_cols = "trajectory_stratum"
 )
 
 fit <- ageTMP_fit_reference_cpsa(
@@ -111,10 +112,28 @@ fit <- ageTMP_fit_reference_cpsa(
   spec = spec,
   trajectory_sd = trajectory_sd,
   trajectory_sd_min = 0.15,
-  trajectory_sd_group_cols = "sex",
+  trajectory_sd_group_cols = "trajectory_stratum",
   trajectory_sd_keep = "any_group"
 )
 ```
+
+Here, `trajectory_sd_group_cols` identifies the column or columns defining
+trajectory strata for dynamic-range screening. In the manuscript analyses this
+was often sex, but the filter itself is generic. With
+`trajectory_sd_keep = "any_group"`, a feature is retained if it is dynamic in at
+least one trajectory stratum; use stricter settings when a feature should be
+dynamic across all modeled strata.
+
+The CPSA model engine computes raw p-values and, by default, Benjamini-Yekutieli
+FDR columns with `stats::p.adjust(..., method = "BY")`. Because CPSA is often
+applied across correlated molecular features and trajectory-derived scores,
+users should inspect empirical test-statistic distributions and consider
+whether additional calibration is appropriate for their modeling design.
+
+In the manuscript reference-cohort analyses, protein and RNA significance calls
+used a separate local-FDR procedure on transformed p-values. That procedure is
+documented in the manuscript figure-generation scripts and is not part of the
+general package API.
 
 ## Optional Age-Class Exploration
 
@@ -277,13 +296,3 @@ Reproducible workflows should read directly from documented source files
 whenever possible and avoid hidden `.RData` objects or manually generated
 intermediate TSV files. Serialized package data are reserved for documented
 external reference data that are part of the analysis provenance.
-
-Detailed manuscript-specific trajectory settings are kept with the relevant
-figure-generation scripts in the Wang Lab reproducibility repository.
-
-The CPSA model engine computes raw p-values and, by default, Benjamini-Yekutieli
-FDR columns with `stats::p.adjust(..., method = "BY")`. In the manuscript
-reference-cohort analyses, protein and RNA significance calls used a separate
-local-FDR procedure on transformed p-values; this is noted for reproducibility
-context and is not built into the package API. The local-FDR specifications are
-kept in the relevant manuscript figure/reproduction code.
