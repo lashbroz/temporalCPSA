@@ -1,0 +1,58 @@
+url: https://lashbroz.github.io/temporalCPSA/
+
+template:
+  bootstrap: 5
+
+navbar:
+  structure:
+    left: [intro, reference, articles]
+    right: [github]
+  components:
+    intro:
+      text: Get started
+      href: articles/temporalCPSA-overview.html
+    articles:
+      text: Articles
+      menu:
+      - text: temporalCPSA overview
+        href: articles/temporalCPSA-overview.html
+
+reference:
+- title: CPSA model specification and fitting
+  contents:
+  - ageTMP_cpsa_spec
+  - ageTMP_prepare_reference_cpsa_survival
+  - ageTMP_fit_reference_cpsa
+  - ageTMP_fit_reference_protein_cpsa
+  - ageTMP_fit_cdisc_protein_cpsa
+- title: Temporal molecular profiles
+  contents:
+  - ageTMP_fit_tumor_trajectory
+  - ageTMP_predict_tumor_trajectory_matrix
+  - ageTMP_compare_normal_tumor_trajectory
+  - ageTMP_rank_trajectory_sd
+  - ageTMP_filter_trajectory_sd
+  - ageTMP_select_dynamic_tmp_features
+- title: Age-class exploration
+  contents:
+  - ageTMP_segment_age_classes
+  - ageTMP_segment_diagnostic_matrix
+  - ageTMP_plot_segment_diagnostic
+  - ageTMP_derive_age_class
+  - ageTMP_derive_age_class_range
+- title: Data loading and harmonization
+  contents:
+  - starts_with("ageTMP_load_")
+  - ageTMP_data_sources
+  - ageTMP_normalize_sample_ids
+  - ageTMP_split_annotation_matrix
+  - ageTMP_collapse_matrix_by_feature
+- title: Manuscript reproduction helpers
+  contents:
+  - starts_with("ageTMP_build_")
+  - starts_with("ageTMP_add_glyco")
+  - starts_with("ageTMP_prepare_glyco")
+  - starts_with("ageTMP_fit_glyco")
+  - ageTMP_glyco_ado_cpsa_spec
+  - ageTMP_glyco_locfdr_settings
+  - ageTMP_extract_glyco_trajectory_terms
