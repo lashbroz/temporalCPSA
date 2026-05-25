@@ -13,6 +13,7 @@ ageTMP_data_sources <- function(data_dir = "data") {
       "glyco",
       "phospho",
       "mutation",
+      "cnv",
       "full_mutation",
       "STable1",
       "STable4",
@@ -25,6 +26,7 @@ ageTMP_data_sources <- function(data_dir = "data") {
       "Disc_glyco_v2_imputed_batch1+2_05082024_011524.tsv",
       "cDisc_phosphosite_imputed_data_ischemia_removed_motif_11032023.tsv",
       "cDisc_mutation_10192023.tsv",
+      "cDisc_CNV_coding_10252023.tsv",
       "Disc_full_mutation_data_100224.tsv",
       "STable1.xlsx",
       "STable4.xlsx",
@@ -83,13 +85,13 @@ ageTMP_load_clinical <- function(data_dir = "data") {
 #'
 #' @param data_dir Path to the public data directory.
 #' @param modality One of `"protein"`, `"rna"`, `"glyco"`, `"phospho"`,
-#'   `"mutation"`, or `"full_mutation"`.
+#'   `"mutation"`, `"cnv"`, or `"full_mutation"`.
 #'
 #' @return A data frame containing feature annotation columns followed by sample columns.
 #' @export
 ageTMP_load_molecular <- function(
   data_dir = "data",
-  modality = c("protein", "rna", "glyco", "phospho", "mutation", "full_mutation")
+  modality = c("protein", "rna", "glyco", "phospho", "mutation", "cnv", "full_mutation")
 ) {
   modality <- match.arg(modality)
   files <- c(
@@ -98,6 +100,7 @@ ageTMP_load_molecular <- function(
     glyco = "Disc_glyco_v2_imputed_batch1+2_05082024_011524.tsv",
     phospho = "cDisc_phosphosite_imputed_data_ischemia_removed_motif_11032023.tsv",
     mutation = "cDisc_mutation_10192023.tsv",
+    cnv = "cDisc_CNV_coding_10252023.tsv",
     full_mutation = "Disc_full_mutation_data_100224.tsv"
   )
 

@@ -6,14 +6,14 @@
 \usage{
 ageTMP_load_molecular(
   data_dir = "data",
-  modality = c("protein", "rna", "glyco", "phospho", "mutation", "full_mutation")
+  modality = c("protein", "rna", "glyco", "phospho", "mutation", "cnv", "full_mutation")
 )
 }
 \arguments{
 \item{data_dir}{Path to the public data directory.}
 
 \item{modality}{One of \code{"protein"}, \code{"rna"}, \code{"glyco"}, \code{"phospho"},
-\code{"mutation"}, or \code{"full_mutation"}.}
+\code{"mutation"}, \code{"cnv"}, or \code{"full_mutation"}.}
 }
 \value{
 A data frame containing feature annotation columns followed by sample columns.

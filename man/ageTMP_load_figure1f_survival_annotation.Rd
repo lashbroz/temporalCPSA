@@ -10,7 +10,7 @@ ageTMP_load_figure1f_survival_annotation(path, quiet = FALSE)
 \item{path}{Path to \code{figure1f_survival_annotation_data.tsv}.}
 
 \item{quiet}{Logical; if \code{TRUE}, suppress the contextual message printed
-when the annotation is loaded.}
+when the packaged annotation is loaded.}
 }
 \value{
 A data frame with the Figure 1F survival-days annotation data.

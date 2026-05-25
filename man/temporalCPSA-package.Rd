@@ -54,6 +54,7 @@ help(package = "temporalCPSA")
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://lashbroz.github.io/temporalCPSA/}
   \item \url{https://github.com/lashbroz/temporalCPSA}
   \item Report bugs at \url{https://github.com/lashbroz/temporalCPSA/issues}
 }
