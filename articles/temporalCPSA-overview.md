@@ -1,0 +1,234 @@
+# temporalCPSA Overview
+
+## What Is CPSA?
+
+Cross-Population Survival Analysis (CPSA) is a framework for evaluating
+prognostic molecular trajectories across complementary patient cohorts.
+
+CPSA estimates temporal molecular patterns (TMPs) in deeply profiled
+discovery cohorts, evaluates their clinical relevance in external
+clinically annotated populations, and validates these prognostic
+patterns back in the discovery cohort. This enables cross-population
+evaluation of prognostic molecular structure across biologically
+heterogeneous datasets.
+
+## What Can This Package Be Used For?
+
+- Reproducing analyses from Tignor et al., *Proteogenomic analysis of
+  pediatric and AYA high-grade glioma*, using the companion [Wang Lab
+  manuscript
+  repository](https://github.com/WangLab-MSSM/Pediatric-AYA-high-grade-glioma).
+- Using deeply profiled CPTAC or related multi-omic cohorts to inform
+  survival modeling in external clinically annotated populations with
+  sparse or absent molecular data.
+- Modeling age-associated molecular trajectories to facilitate
+  comparison of age-related molecular dynamics within and between
+  cohorts, including tumor versus normal and male versus female tissue
+  comparisons.
+- Exploration of age structure within cohorts based on clustering of
+  molecular abundance profiles across diverse multi-omic data types.
+
+## General CPSA Workflow
+
+The core workflow starts with a feature-by-sample matrix and a
+reference-cohort clinical table containing survival time, event status,
+age class, and adjustment covariates.
+
+Default arguments in several trajectory and CPSA helpers reflect the
+manuscript analysis settings; users should review and modify these
+settings for other cohorts, molecular platforms, or modeling designs.
+
+``` r
+
+library(temporalCPSA)
+
+feature_matrix <- your_feature_matrix
+survival_data <- your_survival_data
+
+spec <- ageTMP_cpsa_spec(
+  time_col = "days",
+  event_col = "os.status",
+  age_class_col = "age_class",
+  age_reference = "ADULT",
+  strata = c("PED", "ADO", "YA"),
+  base_covariates = c("age", "Grade", "Cortical", "Midline"),
+  adjustment_covariates = c("TP53_mut", "ATRX_mut", "H33A_mut", "ATM_mut")
+)
+
+fit <- ageTMP_fit_reference_cpsa(
+  feature_matrix = feature_matrix,
+  survival_data = survival_data,
+  spec = spec
+)
+```
+
+For a standard Cox model without age-class interaction terms, set
+`age_class_col`, `age_reference`, and `strata` to `NULL`:
+
+``` r
+
+standard_spec <- ageTMP_cpsa_spec(
+  age_class_col = NULL,
+  age_reference = NULL,
+  strata = NULL,
+  include_all_combined_test = FALSE,
+  base_covariates = c("age", "Grade"),
+  adjustment_covariates = character()
+)
+
+standard_fit <- ageTMP_fit_reference_cpsa(
+  feature_matrix,
+  survival_data,
+  spec = standard_spec
+)
+```
+
+## Trajectory Dynamic-Range Screening
+
+When CPSA is applied to age-dependent trajectory features, users should
+screen out features with minimal trajectory dynamic range before
+interpreting survival associations.
+
+``` r
+
+trajectory_sd <- ageTMP_rank_trajectory_sd(
+  tumor_trajectory,
+  feature_col = "feature",
+  value_col = "fit",
+  group_cols = "trajectory_stratum"
+)
+
+fit <- ageTMP_fit_reference_cpsa(
+  feature_matrix,
+  survival_data,
+  spec = spec,
+  trajectory_sd = trajectory_sd,
+  trajectory_sd_min = 0.15,
+  trajectory_sd_group_cols = "trajectory_stratum",
+  trajectory_sd_keep = "any_group"
+)
+```
+
+`trajectory_sd_group_cols` identifies the column or columns defining
+trajectory strata for dynamic-range screening. In the manuscript
+analyses this was often sex, but the filter itself is generic. With
+`trajectory_sd_keep = "any_group"`, a feature is retained if it is
+dynamic in at least one trajectory stratum.
+
+The CPSA model engine computes raw p-values and, by default,
+Benjamini-Yekutieli FDR columns with
+`stats::p.adjust(..., method = "BY")`. Because CPSA is often applied
+across correlated molecular features and trajectory-derived scores,
+users should inspect empirical test-statistic distributions and consider
+whether additional calibration is appropriate for their modeling design.
+
+In the manuscript reference-cohort analyses, protein and RNA
+significance calls used a separate local-FDR procedure on transformed
+p-values. That procedure is documented in the manuscript
+figure-generation scripts and is not part of the general package API.
+
+## Optional Age-Class Exploration
+
+Age-class estimation is optional. Users may supply age classes, model
+age continuously, or use `temporalCPSA` diagnostics to explore whether
+AD-TMP structure supports age-contiguous intervals.
+
+In the manuscript, age classes were chosen by considering both temporal
+molecular clustering and conventional age distributions. In
+`temporalCPSA`, we implement a data-driven diagnostic approach:
+candidate classes are constrained to ordered age intervals, while the
+AD-TMP matrix determines which intervals are best supported.
+
+``` r
+
+clinical <- ageTMP_load_discovery_clinical("data")
+feature_matrices <- ageTMP_load_feature_matrix(
+  "data",
+  modality = c("protein", "rna", "phospho")
+)
+
+tmp_matrices <- lapply(feature_matrices, function(feature_matrix) {
+  ageTMP_predict_tumor_trajectory_matrix(
+    tumor_mat = feature_matrix,
+    tumor_metadata = clinical,
+    prediction_metadata = clinical,
+    tumor_sample_col = "id",
+    tumor_age_col = "cDisc_age",
+    tumor_sex_col = "cDisc_Gender",
+    prediction_sample_col = "id",
+    prediction_age_col = "cDisc_age",
+    prediction_sex_col = "cDisc_Gender",
+    return_trajectory = FALSE
+  )$matrix
+})
+
+combined_tmp <- ageTMP_combine_tmp_matrices(tmp_matrices)
+
+fit <- ageTMP_segment_age_classes(
+  tmp_matrix = combined_tmp,
+  sample_age = setNames(clinical$cDisc_age, clinical$id),
+  k = 5,
+  min_n = 10,
+  labels = c("PED", "ADO", "YA", "ADULT", "SEN")
+)
+
+fit$cutpoints
+fit$segment_summary
+```
+
+To review the ordered segmentation landscape, draw the green diagnostic
+heatmap and overlay optimizer-selected, manuscript-style, or
+investigator-selected cutpoints.
+
+``` r
+
+diagnostic <- ageTMP_segment_diagnostic_matrix(
+  tmp_matrix = combined_tmp,
+  sample_age = setNames(clinical$cDisc_age, clinical$id),
+  k_values = 2:8,
+  min_n = 10
+)
+
+ageTMP_plot_segment_diagnostic(
+  diagnostic,
+  selected_k = 5,
+  class_labels = c("PED", "ADO", "YA", "ADULT", "SEN"),
+  suggested_cutpoints = c(15, 26, 40, 62),
+  suggested_labels = c("PED", "ADO", "YA", "ADULT", "SEN")
+)
+```
+
+## Manuscript Reproduction
+
+Paper figure-generation scripts live in the companion manuscript
+repository:
+[`WangLab-MSSM/Pediatric-AYA-high-grade-glioma`](https://github.com/WangLab-MSSM/Pediatric-AYA-high-grade-glioma).
+
+Manuscript-specific wrappers such as
+[`ageTMP_build_sa_protein_cdisc()`](https://lashbroz.github.io/temporalCPSA/reference/ageTMP_build_sa_protein_cdisc.md)
+are kept for direct table reproduction because the published table
+columns use the `cdisc` label. Preferred public-facing functions use
+reference-cohort language:
+
+``` r
+
+clinical <- ageTMP_load_reference_clinical("data")
+mutation <- ageTMP_load_reference_mutation("data")
+feature_matrix <- ageTMP_load_reference_protein_matrix("data")
+
+survival_data <- ageTMP_prepare_reference_cpsa_survival(
+  clinical = clinical,
+  mutation = mutation,
+  protein_sample_ids = colnames(feature_matrix),
+  sex = "Female",
+  mutation_na = "preserve"
+)
+```
+
+## Reproducibility Principle
+
+Reproducible workflows should read directly from documented source files
+whenever possible and avoid hidden `.RData` objects or manually
+generated intermediate TSV files. Serialized package data are reserved
+for documented external reference data that are part of the analysis
+provenance.
