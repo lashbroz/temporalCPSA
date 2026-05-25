@@ -18,9 +18,14 @@ navbar:
         href: articles/temporalCPSA-overview.html
 
 reference:
+- title: Package overview
+  contents:
+  - temporalCPSA-package
+  - ageTMP_status
 - title: CPSA model specification and fitting
   contents:
   - ageTMP_cpsa_spec
+  - ageTMP_prepare_cdisc_cpsa_survival
   - ageTMP_prepare_reference_cpsa_survival
   - ageTMP_fit_reference_cpsa
   - ageTMP_fit_reference_protein_cpsa
@@ -40,6 +45,10 @@ reference:
   - ageTMP_plot_segment_diagnostic
   - ageTMP_derive_age_class
   - ageTMP_derive_age_class_range
+  - ageTMP_add_age_class
+  - ageTMP_combine_tmp_matrices
+  - ageTMP_cluster_tmp_samples
+  - ageTMP_summarize_tmp_age_clusters
 - title: Data loading and harmonization
   contents:
   - starts_with("ageTMP_load_")
