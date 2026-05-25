@@ -2,10 +2,6 @@
 
 `temporalCPSA` is an R package implementing the Cross-Population Survival Analysis (CPSA) framework described in Tignor et al., *Proteogenomic analysis of pediatric and AYA high-grade glioma*, supporting both reproducible execution of published study analyses and generalized workflows for integrating and evaluating temporal molecular structure in survival modeling across complementary patient cohorts.
 
-`temporalCPSA` models age-associated molecular trajectories in deeply profiled
-reference cohorts and projects those patterns into external clinically
-annotated cohorts for comparative analysis and survival modeling.
-
 ## Installation
 
 Install the current development version from GitHub:
