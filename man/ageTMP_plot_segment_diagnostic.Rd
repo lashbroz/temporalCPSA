@@ -19,8 +19,9 @@ ageTMP_plot_segment_diagnostic(
 \arguments{
 \item{diagnostic}{Output of \code{\link[=ageTMP_segment_diagnostic_matrix]{ageTMP_segment_diagnostic_matrix()}}.}
 
-\item{selected_k}{Which fitted \code{k} to overlay. Defaults to the largest fitted
-\code{k}.}
+\item{selected_k}{Which fitted \code{k} to overlay. If \code{NULL}, defaults to the
+fitted \code{k} with the largest mean silhouette when available, otherwise the
+largest fitted \code{k}.}
 
 \item{class_labels}{Optional labels for the selected classes. If \code{NULL}, the
 labels stored in the selected fit are used.}

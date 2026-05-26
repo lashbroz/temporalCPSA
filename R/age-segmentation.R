@@ -186,7 +186,9 @@ ageTMP_segment_age_classes <- function(
 #' @inheritParams ageTMP_segment_age_classes
 #' @param k_values Integer vector of segment counts to fit.
 #'
-#' @return A list with `matrix`, `ordered_samples`, and per-`k` `fits`.
+#' @return A list with `matrix`, `ordered_samples`, per-`k` `fits`, and a
+#'   `summary` table containing the segmentation score and mean silhouette width
+#'   for each candidate `k`.
 #' @export
 ageTMP_segment_diagnostic_matrix <- function(
   tmp_matrix,
@@ -200,6 +202,13 @@ ageTMP_segment_diagnostic_matrix <- function(
   if (length(k_values) == 0) {
     stop("`k_values` must contain at least one positive integer.", call. = FALSE)
   }
+  tmp_for_silhouette <- as.matrix(tmp_matrix)
+  if (isTRUE(scale_rows)) {
+    tmp_for_silhouette <- t(scale(t(tmp_for_silhouette)))
+  }
+  tmp_for_silhouette <- tmp_for_silhouette[rowSums(is.na(tmp_for_silhouette)) == 0, , drop = FALSE]
+  colnames(tmp_for_silhouette) <- ageTMP_normalize_sample_ids(colnames(tmp_for_silhouette))
+
   fits <- lapply(k_values, function(k) {
     ageTMP_segment_age_classes(
       tmp_matrix = tmp_matrix,
@@ -218,7 +227,25 @@ ageTMP_segment_diagnostic_matrix <- function(
   }))
   rownames(mat) <- names(fits)
   colnames(mat) <- ordered_ids
-  list(matrix = mat, ordered_samples = fits[[1]]$ordered_samples, fits = fits)
+  tmp_for_silhouette <- tmp_for_silhouette[, ordered_ids, drop = FALSE]
+  sample_dist <- stats::dist(t(tmp_for_silhouette))
+  mean_silhouette <- vapply(fits, function(fit) {
+    if (!requireNamespace("cluster", quietly = TRUE) || fit$k < 2) {
+      return(NA_real_)
+    }
+    classes <- as.integer(fit$classes[ordered_ids])
+    if (length(unique(classes)) < 2) {
+      return(NA_real_)
+    }
+    mean(cluster::silhouette(classes, sample_dist)[, "sil_width"], na.rm = TRUE)
+  }, numeric(1))
+  summary <- data.frame(
+    k = k_values,
+    score = vapply(fits, `[[`, numeric(1), "score"),
+    mean_silhouette = mean_silhouette,
+    stringsAsFactors = FALSE
+  )
+  list(matrix = mat, ordered_samples = fits[[1]]$ordered_samples, fits = fits, summary = summary)
 }
 
 #' Plot an ordered age-segmentation diagnostic heatmap
@@ -230,8 +257,9 @@ ageTMP_segment_diagnostic_matrix <- function(
 #' can be read directly from the diagnostic display.
 #'
 #' @param diagnostic Output of [ageTMP_segment_diagnostic_matrix()].
-#' @param selected_k Which fitted `k` to overlay. Defaults to the largest fitted
-#'   `k`.
+#' @param selected_k Which fitted `k` to overlay. If `NULL`, defaults to the
+#'   fitted `k` with the largest mean silhouette when available, otherwise the
+#'   largest fitted `k`.
 #' @param class_labels Optional labels for the selected classes. If `NULL`, the
 #'   labels stored in the selected fit are used.
 #' @param palette Optional color palette. Defaults to a light-to-dark green
@@ -269,7 +297,12 @@ ageTMP_plot_segment_diagnostic <- function(
     palette <- grDevices::colorRampPalette(c("#d9f0d3", "#74c476", "#006d2c"))(max(mat, na.rm = TRUE))
   }
   if (is.null(selected_k)) {
-    selected_name <- utils::tail(names(diagnostic$fits), 1)
+    if ("summary" %in% names(diagnostic) && "mean_silhouette" %in% names(diagnostic$summary) &&
+        any(!is.na(diagnostic$summary$mean_silhouette))) {
+      selected_name <- paste0("k", diagnostic$summary$k[which.max(diagnostic$summary$mean_silhouette)])
+    } else {
+      selected_name <- utils::tail(names(diagnostic$fits), 1)
+    }
   } else {
     selected_name <- paste0("k", as.integer(selected_k))
   }
@@ -279,9 +312,9 @@ ageTMP_plot_segment_diagnostic <- function(
   selected <- diagnostic$fits[[selected_name]]
   age <- diagnostic$ordered_samples$age
 
-  old_mar <- graphics::par("mar")
-  on.exit(graphics::par(mar = old_mar), add = TRUE)
-  graphics::par(mar = c(if (isTRUE(show_age_axis)) 4 else 2, 5, 4, 1))
+  old_par <- graphics::par(c("mar", "xpd"))
+  on.exit(graphics::par(old_par), add = TRUE)
+  graphics::par(mar = c(if (isTRUE(show_age_axis)) 5 else 2, 5, 4, 6), xpd = NA)
   graphics::image(
     x = seq_len(ncol(mat)),
     y = seq_len(nrow(mat)),
@@ -300,10 +333,31 @@ ageTMP_plot_segment_diagnostic <- function(
     las = 1
   )
   if (isTRUE(show_age_axis)) {
-    ticks <- pretty(age)
-    tick_pos <- vapply(ticks, function(x) which.min(abs(age - x)), integer(1))
-    keep <- !duplicated(tick_pos) & ticks >= min(age, na.rm = TRUE) & ticks <= max(age, na.rm = TRUE)
-    graphics::axis(side = 1, at = tick_pos[keep], labels = ticks[keep])
+    ticks <- seq(floor(min(age, na.rm = TRUE)), ceiling(max(age, na.rm = TRUE)), by = 1)
+    tick_pos <- stats::approx(age, seq_along(age), xout = ticks, rule = 2, ties = "ordered")$y
+    keep <- ticks >= min(age, na.rm = TRUE) & ticks <= max(age, na.rm = TRUE)
+    graphics::axis(side = 1, at = tick_pos[keep], labels = ticks[keep], las = 2, cex.axis = 0.6)
+  }
+
+  if ("summary" %in% names(diagnostic) && "mean_silhouette" %in% names(diagnostic$summary)) {
+    diagnostic_summary <- diagnostic$summary
+    label_by_k <- stats::setNames(
+      ifelse(
+        is.na(diagnostic_summary$mean_silhouette),
+        "NA",
+        sprintf("%.2f", diagnostic_summary$mean_silhouette)
+      ),
+      paste0("k", diagnostic_summary$k)
+    )
+    row_labels <- label_by_k[rownames(mat)]
+    graphics::mtext("Mean\nsil.", side = 4, line = 2.7, at = nrow(mat) + 0.4, cex = 0.75, font = 2)
+    graphics::text(
+      x = ncol(mat) + 3.5,
+      y = seq_len(nrow(mat)),
+      labels = rev(row_labels),
+      cex = 0.75,
+      adj = 0
+    )
   }
 
   if (!is.null(suggested_cutpoints)) {

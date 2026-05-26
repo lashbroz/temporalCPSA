@@ -28,7 +28,9 @@ vector must be in the same order as \code{colnames(tmp_matrix)}.}
 segments. Set this to \code{FALSE} when \code{tmp_matrix} has already been row-scaled.}
 }
 \value{
-A list with \code{matrix}, \code{ordered_samples}, and per-\code{k} \code{fits}.
+A list with \code{matrix}, \code{ordered_samples}, per-\code{k} \code{fits}, and a
+\code{summary} table containing the segmentation score and mean silhouette width
+for each candidate \code{k}.
 }
 \description{
 Fit contiguous AD-TMP segmentations for a range of \code{k} values and return a
