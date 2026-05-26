@@ -11,9 +11,6 @@ install.packages("remotes")
 remotes::install_github("lashbroz/temporalCPSA")
 ```
 
-Package documentation and the overview article are available at
-<https://lashbroz.github.io/temporalCPSA/>.
-
 ## What Is CPSA?
 
 Cross-Population Survival Analysis (CPSA) is a framework for evaluating
