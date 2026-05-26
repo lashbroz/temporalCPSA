@@ -32,7 +32,9 @@ ageTMP_plot_segment_diagnostic(
 
 - selected_k:
 
-  Which fitted `k` to overlay. Defaults to the largest fitted `k`.
+  Which fitted `k` to overlay. If `NULL`, defaults to the fitted `k`
+  with the largest mean silhouette when available, otherwise the largest
+  fitted `k`.
 
 - class_labels:
 

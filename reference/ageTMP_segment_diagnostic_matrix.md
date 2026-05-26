@@ -45,4 +45,6 @@ ageTMP_segment_diagnostic_matrix(
 
 ## Value
 
-A list with `matrix`, `ordered_samples`, and per-`k` `fits`.
+A list with `matrix`, `ordered_samples`, per-`k` `fits`, and a `summary`
+table containing the segmentation score and mean silhouette width for
+each candidate `k`.
