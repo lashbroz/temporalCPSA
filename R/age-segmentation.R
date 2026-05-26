@@ -271,6 +271,11 @@ ageTMP_segment_diagnostic_matrix <- function(
 #'   age classes on top of the ordered segmentation landscape.
 #' @param suggested_labels Optional labels for the age intervals defined by
 #'   `suggested_cutpoints`.
+#' @param show_split_hierarchy Whether to annotate the dominant contiguous
+#'   split and next supported splits from the fitted segmentation summary.
+#' @param split_label_k Optional integer k values used for hierarchy labels.
+#'   By default, the selected k is labeled as dominant and the next best
+#'   non-selected k by mean silhouette is labeled as the next supported split.
 #' @param ... Additional arguments passed to [graphics::image()].
 #'
 #' @return Invisibly returns `diagnostic`.
@@ -284,6 +289,8 @@ ageTMP_plot_segment_diagnostic <- function(
   show_age_axis = TRUE,
   suggested_cutpoints = NULL,
   suggested_labels = NULL,
+  show_split_hierarchy = TRUE,
+  split_label_k = NULL,
   ...
 ) {
   if (!is.list(diagnostic) || !all(c("matrix", "ordered_samples", "fits") %in% names(diagnostic))) {
@@ -371,7 +378,15 @@ ageTMP_plot_segment_diagnostic <- function(
       sum(age <= x) + 0.5
     }, numeric(1))
     if (length(suggested_pos) > 0) {
-      graphics::abline(v = suggested_pos, col = "#111111", lwd = 2, lty = 1)
+      graphics::segments(
+        x0 = suggested_pos,
+        y0 = 0.5,
+        x1 = suggested_pos,
+        y1 = nrow(mat) + 0.5,
+        col = "#111111",
+        lwd = 2,
+        lty = 1
+      )
       graphics::mtext(
         text = format(suggested_cutpoints, trim = TRUE),
         side = 3,
@@ -415,7 +430,15 @@ ageTMP_plot_segment_diagnostic <- function(
 
   cut_positions <- selected$segment_summary$end_index[-nrow(selected$segment_summary)] + 0.5
   if (length(cut_positions) > 0) {
-    graphics::abline(v = cut_positions, col = "black", lwd = 1.5, lty = 2)
+    graphics::segments(
+      x0 = cut_positions,
+      y0 = 0.5,
+      x1 = cut_positions,
+      y1 = nrow(mat) + 0.5,
+      col = "black",
+      lwd = 2.4,
+      lty = 2
+    )
   }
   summary <- selected$segment_summary
   mids <- (summary$start_index + summary$end_index) / 2
@@ -429,6 +452,230 @@ ageTMP_plot_segment_diagnostic <- function(
     cex = 0.8,
     font = 2
   )
+
+  if (isTRUE(show_split_hierarchy) && "summary" %in% names(diagnostic)) {
+    summary_df <- diagnostic$summary
+    if (is.null(split_label_k)) {
+      split_label_k <- as.integer(sub("^k", "", selected_name))
+      if ("mean_silhouette" %in% names(summary_df)) {
+        remaining <- summary_df[summary_df$k != split_label_k & !is.na(summary_df$mean_silhouette), , drop = FALSE]
+        if (nrow(remaining) > 0) {
+          split_label_k <- c(split_label_k, remaining$k[which.max(remaining$mean_silhouette)])
+        }
+      }
+    }
+    split_label_k <- unique(split_label_k[!is.na(split_label_k)])
+    split_labels <- c("Dominant split", "Next supported split", "Additional supported split")
+    label_rows <- seq_len(min(length(split_label_k), length(split_labels)))
+    for (i in label_rows) {
+      fit_name <- paste0("k", split_label_k[[i]])
+      if (!fit_name %in% names(diagnostic$fits)) {
+        next
+      }
+      fit <- diagnostic$fits[[fit_name]]
+      if (nrow(fit$segment_summary) < 2) {
+        next
+      }
+      pos <- fit$segment_summary$end_index[-nrow(fit$segment_summary)] + 0.5
+      y_pos <- nrow(mat) - match(fit_name, rownames(mat)) + 1L
+      graphics::segments(
+        x0 = pos,
+        y0 = y_pos - 0.42,
+        x1 = pos,
+        y1 = y_pos + 0.42,
+        col = "#111111",
+        lwd = if (i == 1L) 3.2 else 2.4
+      )
+      label <- split_labels[[i]]
+      if (i == 1L && length(pos) == 1L) {
+        label <- paste0(label, "\n~", round(age[min(length(age), max(1, floor(pos)))], 0), " yr")
+      }
+      graphics::text(
+        x = min(max(pos), ncol(mat) + 1.2),
+        y = y_pos + 0.58,
+        labels = label,
+        cex = if (i == 1L) 0.78 else 0.68,
+        font = 2,
+        adj = c(0, 0),
+        col = "#111111"
+      )
+    }
+  }
+  invisible(diagnostic)
+}
+
+#' Plot age-segmentation depth from contiguous AD-TMP structure
+#'
+#' Draw a simplified depth plot for contiguous age-segmentation diagnostics.
+#' Each row shows the age cutpoints selected for a candidate `k`, with darker
+#' bars and thicker cutpoint markers emphasizing deeper supported splits. This
+#' plot is intended for interpretation and communication of the segmentation
+#' hierarchy, while [ageTMP_plot_segment_diagnostic()] provides the fuller
+#' ordered diagnostic heatmap.
+#'
+#' @param diagnostic Output of [ageTMP_segment_diagnostic_matrix()].
+#' @param xlim Numeric length-two age range for the display.
+#' @param main Plot title.
+#' @param dominant_label Label for the selected strongest split.
+#' @param support_labels Optional named character vector mapping k values to
+#'   support-level labels.
+#' @param show_sample_rug Whether to show sample ages as a rug track.
+#' @param show_legend Whether to show a compact explanatory legend.
+#'
+#' @return Invisibly returns `diagnostic`.
+#' @export
+ageTMP_plot_segment_depth <- function(
+  diagnostic,
+  xlim = c(0, 80),
+  main = "Data-Driven Age-Segmentation Depth from AD-TMP Structure",
+  dominant_label = "max silhouette: strongest split",
+  support_labels = NULL,
+  show_sample_rug = TRUE,
+  show_legend = TRUE
+) {
+  if (!is.list(diagnostic) || !all(c("fits", "summary", "ordered_samples") %in% names(diagnostic))) {
+    stop("`diagnostic` must be the output of `ageTMP_segment_diagnostic_matrix()`.", call. = FALSE)
+  }
+  summary_df <- diagnostic$summary
+  if (!all(c("k", "mean_silhouette") %in% names(summary_df))) {
+    stop("`diagnostic$summary` must contain `k` and `mean_silhouette`.", call. = FALSE)
+  }
+  cutpoints_by_k <- lapply(summary_df$k, function(k) {
+    fit <- diagnostic$fits[[paste0("k", k)]]
+    if (is.null(fit) || nrow(fit$segment_summary) < 2) {
+      return(numeric())
+    }
+    fit$cutpoints
+  })
+  if (is.null(support_labels)) {
+    support_labels <- c(
+      `2` = "deepest",
+      `3` = "next broad",
+      `4` = "finer",
+      `5` = "intermediate",
+      `6` = "intermediate",
+      `7` = "finer",
+      `8` = "finer"
+    )
+  }
+  k_vals <- summary_df$k
+  y <- rev(seq_along(k_vals)) * 1.18
+  max_y <- max(y)
+  selected_i <- if ("selected_by_max_mean_silhouette" %in% names(summary_df) &&
+      any(isTRUE(summary_df$selected_by_max_mean_silhouette))) {
+    which(summary_df$selected_by_max_mean_silhouette)[[1]]
+  } else {
+    which.max(summary_df$mean_silhouette)
+  }
+  dominant_values <- cutpoints_by_k[[selected_i]]
+  dominant <- if (summary_df$k[[selected_i]] == 2L && length(dominant_values) == 1L) {
+    dominant_values[[1]]
+  } else {
+    NA_real_
+  }
+
+  old_par <- graphics::par(no.readonly = TRUE)
+  on.exit(graphics::par(old_par), add = TRUE)
+  graphics::par(mar = c(5.8, 4.8, 3.5, 4.8), xpd = FALSE)
+  graphics::plot(
+    NA,
+    xlim = c(xlim[[1]] - 18, xlim[[2]] + 16),
+    ylim = c(-0.75, max_y + 1.0),
+    axes = FALSE,
+    xlab = "",
+    ylab = "",
+    main = main,
+    cex.main = 1.15,
+    font.main = 2
+  )
+  graphics::axis(1, at = seq(xlim[[1]], xlim[[2]], by = 5), cex.axis = 0.85)
+  graphics::mtext("Age in years", side = 1, line = 3.4, cex = 0.9)
+  graphics::text(xlim[[1]] - 16.0, max_y + 0.62, labels = "support level", adj = 0, cex = 0.78, font = 2)
+
+  green_dark <- "#006d2c"
+  green_light <- "#d9f0d3"
+  label_col <- c(deepest = "black", `next broad` = "#238b45", finer = "#555555", intermediate = "#555555")
+  for (i in seq_along(k_vals)) {
+    k <- k_vals[[i]]
+    yi <- y[[i]]
+    cuts <- cutpoints_by_k[[i]]
+    cuts <- cuts[!is.na(cuts)]
+    boundaries <- c(xlim[[1]], cuts, xlim[[2]])
+    n_seg <- length(boundaries) - 1L
+    seg_cols <- grDevices::colorRampPalette(c(green_light, green_dark))(max(2L, n_seg))
+    for (j in seq_len(n_seg)) {
+      graphics::segments(
+        boundaries[j],
+        yi,
+        boundaries[j + 1L],
+        yi,
+        col = seg_cols[j],
+        lwd = 10,
+        lend = "butt"
+      )
+    }
+    if (length(cuts) > 0) {
+      is_dominant_cut <- !is.na(dominant) & abs(cuts - dominant) < 0.1
+      lwd <- ifelse(is_dominant_cut, 5, 3)
+      graphics::segments(cuts, yi - 0.16, cuts, yi + 0.16, col = "#222222", lwd = lwd, lend = "round")
+      cut_labels <- round(cuts, 1)
+      cut_labels[i == selected_i & is_dominant_cut] <- ""
+      graphics::text(cuts, yi + 0.58, labels = cut_labels, srt = 55, cex = 0.58, col = "#444444")
+    }
+    level <- unname(support_labels[as.character(k)])
+    if (is.na(level)) level <- "candidate"
+    level_color <- label_col[[level]]
+    if (is.null(level_color)) level_color <- "#555555"
+    graphics::text(xlim[[1]] - 16.0, yi, labels = level, adj = 0, cex = 0.72, col = level_color)
+    graphics::text(xlim[[1]] - 0.2, yi, labels = paste0("K=", k), adj = 1, cex = 0.78)
+    graphics::text(
+      xlim[[2]] + 4,
+      yi,
+      labels = sprintf("mean sil. %.2f", summary_df$mean_silhouette[[i]]),
+      adj = 0,
+      cex = 0.78,
+      col = if (i == selected_i) "black" else if (k == 3) "#238b45" else "#333333"
+    )
+  }
+
+  if (!is.na(dominant)) {
+    dom_y <- y[[selected_i]]
+    graphics::segments(dominant, dom_y - 0.22, dominant, dom_y + 0.24, col = "black", lwd = 7, lend = "round")
+    dom_age <- round(dominant)
+    graphics::text(dominant + 0.15, dom_y + 0.66, labels = dom_age, srt = 55, font = 2, cex = 0.75)
+    graphics::arrows(dominant + 5.3, dom_y + 0.62, dominant + 0.25, dom_y + 0.25, length = 0.08, lwd = 1.5)
+    graphics::text(
+      dominant + 5.6,
+      dom_y + 0.76,
+      labels = dominant_label,
+      adj = 0,
+      cex = 0.82,
+      font = 2
+    )
+  }
+
+  if (isTRUE(show_sample_rug) && "age" %in% names(diagnostic$ordered_samples)) {
+    ages <- sort(unique(round(as.numeric(diagnostic$ordered_samples$age), 3)))
+    rug_y <- 0.62
+    graphics::segments(ages, rug_y - 0.05, ages, rug_y + 0.05, col = "#c9c9c9", lwd = 0.8)
+    graphics::text(xlim[[1]], rug_y - 0.26, labels = "sample ages", adj = 0, cex = 0.65, col = "#555555")
+  }
+
+  if (isTRUE(show_legend)) {
+    legend_y <- -0.32
+    legend_x <- c(xlim[[1]] - 6, xlim[[1]] + 27, xlim[[1]] + 58)
+    graphics::segments(legend_x[[1]], legend_y, legend_x[[1]] + 3, legend_y, col = green_dark, lwd = 5, lend = "round")
+    graphics::text(legend_x[[1]] + 4.4, legend_y, labels = "darker = deeper supported split", adj = 0, cex = 0.62)
+    if (!is.na(dominant)) {
+      graphics::segments(legend_x[[2]], legend_y, legend_x[[2]] + 3, legend_y, col = "black", lwd = 7, lend = "round")
+      graphics::text(legend_x[[2]] + 4.4, legend_y, labels = paste0("dominant ~", round(dominant), " cutpoint"), adj = 0, cex = 0.62)
+      graphics::segments(legend_x[[3]], legend_y, legend_x[[3]] + 3, legend_y, col = "#222222", lwd = 3, lend = "round")
+      graphics::text(legend_x[[3]] + 4.4, legend_y, labels = "additional cutpoints", adj = 0, cex = 0.62)
+    } else {
+      graphics::segments(legend_x[[2]], legend_y, legend_x[[2]] + 3, legend_y, col = "#222222", lwd = 3, lend = "round")
+      graphics::text(legend_x[[2]] + 4.4, legend_y, labels = "candidate cutpoints", adj = 0, cex = 0.62)
+    }
+  }
   invisible(diagnostic)
 }
 
