@@ -21,9 +21,9 @@ heterogeneous datasets.
 - Using deeply profiled CPTAC or related multi-omic cohorts to inform
   survival modeling in external clinically annotated populations with
   sparse or absent molecular data.
-- Applying CPSA results to prioritize candidate prognostic biomarkers
-  whose temporal molecular patterns show outcome relevance across
-  complementary patient cohorts.
+- Leveraging temporal molecular structure to identify prognostic
+  biomarkers whose outcome associations reflect conserved biological
+  dynamics across complementary patient cohorts.
 - Modeling age-associated molecular trajectories to facilitate
   comparison of age-related molecular dynamics within and between
   cohorts, including tumor versus normal and male versus female tissue
