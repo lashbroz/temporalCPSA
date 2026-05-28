@@ -9,9 +9,9 @@ CPSA estimates temporal molecular patterns (TMPs) in deeply profiled
 discovery cohorts, evaluates their clinical relevance in external
 clinically annotated populations, and validates these prognostic
 patterns back in the discovery cohort. By leveraging age-associated
-molecular structure rather than static cohort-specific associations
-alone, CPSA supports cross-population prioritization of prognostic
-signals that may reflect conserved biological dynamics across
+molecular structure rather than survival associations observed within a
+single cohort alone, CPSA supports cross-population prioritization of
+prognostic signals that may reflect conserved biological dynamics across
 heterogeneous datasets.
 
 ## What Can This Package Be Used For?
