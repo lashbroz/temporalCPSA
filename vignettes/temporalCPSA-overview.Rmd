@@ -42,9 +42,9 @@ conserved biological dynamics across heterogeneous datasets.
   molecular data.
 - Using temporal molecular structure to support prognostic biomarker
   prioritization and biological interpretation.
-- Modeling age-associated molecular trajectories to compare temporal molecular
-  programs within and between cohorts, including developmental, tumor versus
-  normal, and sex-stratified contexts.
+- Modeling age-associated molecular variation and comparing trajectory patterns
+  across cohorts, for example between tumor and reference tissues or across
+  analysis strata such as sex.
 - Exploring cohort structure through contiguous segmentation of age-ordered
   molecular profiles, a strategy that may extend to other ordered biological
   or longitudinal axes.
