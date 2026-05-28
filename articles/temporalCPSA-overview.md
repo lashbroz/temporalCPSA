@@ -14,6 +14,9 @@ single cohort alone, CPSA supports cross-population prioritization of
 prognostic signals that may reflect conserved biological dynamics across
 heterogeneous datasets.
 
+In practice, CPSA uses temporal molecular structure to support
+prognostic biomarker prioritization and biological interpretation.
+
 ## What Can This Package Be Used For?
 
 - Reproducing analyses from Tignor et al., *Proteogenomic analysis of
@@ -23,8 +26,6 @@ heterogeneous datasets.
 - Using deeply profiled CPTAC or related multi-omic cohorts to inform
   survival modeling in external clinically annotated populations with
   sparse or absent molecular data.
-- Using temporal molecular structure to support prognostic biomarker
-  prioritization and biological interpretation.
 - Modeling age-associated molecular variation and comparing trajectory
   patterns across cohorts, for example between tumor and reference
   tissues or across analysis strata such as sex.
