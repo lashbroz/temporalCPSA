@@ -2,14 +2,16 @@
 
 ## What Is CPSA?
 
-Cross-Population Survival Analysis (CPSA) is a framework for evaluating
+Cross-Population Survival Analysis (CPSA) is a framework for assessing
 prognostic molecular trajectories across complementary patient cohorts.
 
 CPSA estimates temporal molecular patterns (TMPs) in deeply profiled
 discovery cohorts, evaluates their clinical relevance in external
 clinically annotated populations, and validates these prognostic
-patterns back in the discovery cohort. This enables cross-population
-evaluation of prognostic molecular structure across biologically
+patterns back in the discovery cohort. By leveraging age-associated
+molecular structure rather than static cohort-specific associations
+alone, CPSA supports cross-population prioritization of prognostic
+signals that may reflect conserved biological dynamics across
 heterogeneous datasets.
 
 ## What Can This Package Be Used For?
