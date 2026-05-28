@@ -23,9 +23,9 @@ heterogeneous datasets.
 - Using deeply profiled CPTAC or related multi-omic cohorts to inform
   survival modeling in external clinically annotated populations with
   sparse or absent molecular data.
-- Leveraging temporal molecular structure to identify prognostic
+- Leveraging temporal molecular structure to prioritize prognostic
   biomarkers whose outcome associations reflect conserved biological
-  dynamics across complementary patient cohorts.
+  dynamics.
 - Modeling age-associated molecular trajectories to compare temporal
   molecular programs within and between cohorts, including
   developmental, tumor versus normal, and sex-stratified contexts.
