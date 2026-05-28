@@ -26,12 +26,15 @@ heterogeneous datasets.
 - Leveraging temporal molecular structure to identify prognostic
   biomarkers whose outcome associations reflect conserved biological
   dynamics across complementary patient cohorts.
-- Modeling age-associated molecular trajectories to facilitate
-  comparison of age-related molecular dynamics within and between
-  cohorts, including tumor versus normal and male versus female tissue
-  comparisons.
-- Exploration of age structure within cohorts based on clustering of
-  molecular abundance profiles across diverse multi-omic data types.
+- Modeling age-associated molecular trajectories to compare temporal
+  molecular programs within and between cohorts, including
+  developmental, tumor versus normal, and sex-stratified contexts.
+- Exploring cohort structure through contiguous segmentation of
+  age-ordered molecular profiles, a strategy that may extend to other
+  ordered biological or longitudinal axes.
+- Comparing temporal molecular programs across heterogeneous multi-omic
+  data types, including transcriptomic, proteomic, phosphoproteomic,
+  glycoproteomic, and genomic feature spaces.
 
 ## General CPSA Workflow
 
